@@ -1,0 +1,6 @@
+= API Guide for Developers
+
+:toc: right
+
+== Authentication
+How users authenticate with an API is an important part of 
