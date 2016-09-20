@@ -3,7 +3,7 @@ Home Office API Guide for Developers
 :toc:
 :numbered:
 
-==Introduction
+== Introduction
 This document is intended to help developers in the Home Office understand our current and recommended approaches for developing APIs
 
 == Authentication
@@ -54,3 +54,15 @@ Basic HTTP auth requires a username and password to be sent with every request.
 |
 |User accounts have to be managed by your application, introducing complexity
 |===
+
+== End to end tests, documentation, and creating a mock of your API
+These topics all go hand in hand - frequently one document can be the basis for tests, documentation, and for generating a mock. Here we will cover the common approaches we favour, and when each is appropriate.
+
+== Technologies for building APIs
+This will never be a conclusive list, but just says what technologies we have found good and bad for building APIs, and when we would recommend each of them.
+
+== API Versioning
+This section will detail our approach to API versioning. Please note though having to version an API is never a desirable thing and should be avoided if possible using the strategy of expanding and contracting APIs (contracting once all clients have migrated away from old functionality).
+
+== API Gateways
+Currently still something we are looking into, so consider this a placeholder for thoughts on API Gateways
