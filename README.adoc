@@ -1,0 +1,68 @@
+Home Office API Guide for Developers
+====================================
+:toc:
+:numbered:
+
+== Introduction
+This document is intended to help developers in the Home Office understand our current and recommended approaches for developing APIs
+
+== Authentication
+How consumers authenticate with an API is important for many APIs. Whilst we've not settled on a standard the following approaches have been tried.
+
+=== Mutual TLS
+Mutual TLS means that connecting clients need to have a client certificate before using the service. Typically the system terminating the mutual TLS will add headers to identify the client. The could allow your application to use these for example for granular permissions.
+
+.Pros and Cons of Mutual TLS
+|===
+|Pros | Cons
+|Can use standard nginx or similar for this purpose, so your application doesn't need to worry about auth
+|Client certificates will expire, and hence need to recreate these for all clients periodically, which introduces a lot of overhead and potential for errors
+
+|
+|Have to maintain a CA for signing client certs
+|===
+
+=== OAuth2 with keycloak
+OAuth2 is very commonly used for user authentication, but less frequently for API authentication. This is reflected by fewer client auth libraries available than you may expect. However the logic is trivial to implement.
+
+We can implement OAuth2 authentication trivially using keycloak-proxy in front of an API, authenticating to a centralised keycloak server. This is especially beneficial as keycloak-proxy combined with a centralised keycloak give many capabilities for free such as role and user management, brute force prevention.
+
+.Pros and Cons of OAuth2 with keycloak
+|===
+|Pros | Cons
+|Can implement trivially using keycloak-proxy and keycloak
+|Client auth is slightly more complicated
+
+|Get a lot of capabilities for free with keycloak
+|
+
+|Possibility for consumers to rotate their own credentials, reducing administrative overhead
+|
+
+|Creds are only sent to the system on first auth or when the authentication token expires
+|===
+
+=== Basic HTTP Auth with username and password
+Basic HTTP auth requires a username and password to be sent with every request.
+
+.Pros and Cons of Basic HTTP Auth
+|===
+|Pros | Cons
+|Very simple to set up initially
+|Doing anything beyond basic auth is difficult
+
+|
+|User accounts have to be managed by your application, introducing complexity
+|===
+
+== End to end tests, documentation, and creating a mock of your API
+These topics all go hand in hand - frequently one document can be the basis for tests, documentation, and for generating a mock. Here we will cover the common approaches we favour, and when each is appropriate.
+
+== Technologies for building APIs
+This will never be a conclusive list, but just says what technologies we have found good and bad for building APIs, and when we would recommend each of them.
+
+== API Versioning
+This section will detail our approach to API versioning. Please note though having to version an API is never a desirable thing and should be avoided if possible using the strategy of expanding and contracting APIs (contracting once all clients have migrated away from old functionality).
+
+== API Gateways
+Currently still something we are looking into, so consider this a placeholder for thoughts on API Gateways
