@@ -2,6 +2,9 @@ Home Office API Guide for Developers
 ====================================
 :toc:
 :numbered:
+:toc-placement!:
+
+toc::[]
 
 == Introduction
 This document is intended to help developers in the Home Office understand our current and recommended approaches for developing APIs
