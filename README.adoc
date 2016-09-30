@@ -71,7 +71,7 @@ These topics all go hand in hand - frequently one document can be the basis for 
 * Allows testing and documentation of a json schema for your API
 
 *Example application using this approach* +
-https://github.com/UKHomeOffice/lev-api-docs[Example docs and mock] for the LEV project are available here.
+https://ukhomeoffice.github.io/lev-api-docs/[Example docs] and https://github.com/UKHomeOffice/lev-api-docs/tree/master/mock[mock] for the LEV project are available here.
 
 https://gitlab.digital.homeoffice.gov.uk/lev/lev-api-scala[Code] is available here (you may need to ask a member of the LEV team for access).
 
