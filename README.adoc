@@ -22,7 +22,7 @@ Mutual TLS means that connecting clients need to have a client certificate befor
 |Client certificates will expire, and hence need to recreate these for all clients periodically, which introduces a lot of overhead and potential for errors
 
 |
-|Have to maintain a CA for signing client certs
+|Have to maintain a CA for signing client certs. (Have you thought about how you will revoke access should this need arise?)
 |===
 
 === OAuth2 with keycloak
@@ -51,11 +51,8 @@ Basic HTTP auth requires a username and password to be sent with every request.
 .Pros and Cons of Basic HTTP Auth
 |===
 |Pros | Cons
-|Very simple to set up initially
-|Doing anything beyond basic auth is difficult
-
-|
-|User accounts have to be managed by your application, introducing complexity
+|Simple
+|Simple
 |===
 
 == Acceptance tests, documentation, and creating a mock of your API
