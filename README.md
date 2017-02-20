@@ -272,5 +272,7 @@ JSONP is [not secure or performant](https://gist.github.com/tmcw/6244497). If IE
 
 ## Further reading
 [Microsoft's API guidelines on GitHub](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md)
+
 [GitHub's API guide for developers](https://developer.github.com/v3/)
+
 [GDS API guide](https://www.gov.uk/service-manual/technology/application-programming-interfaces-apis)
