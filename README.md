@@ -268,3 +268,9 @@ For more advanced configuration, see the [W3C spec](http://www.w3.org/TR/cors/) 
 **Avoid JSONP**
 
 JSONP is [not secure or performant](https://gist.github.com/tmcw/6244497). If IE8 or IE9 must be supported, use Microsoft's [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx?Redirected#true) object instead of JSONP. There are [libraries](https://github.com/mapbox/corslite) to help with this.
+
+
+## Further reading
+[Microsoft's API guidelines on GitHub](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md)
+[GitHub's API guide for developers](https://developer.github.com/v3/)
+[GDS API guide](https://www.gov.uk/service-manual/technology/application-programming-interfaces-apis)
