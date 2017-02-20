@@ -261,6 +261,15 @@ JSONP is [not secure or performant](https://gist.github.com/tmcw/6244497). If IE
 
 
 ## Further reading
+
+[HTTP 1.1 RFC](https://tools.ietf.org/html/rfc7231)
+
+[HTTP 1.2 RFC](https://tools.ietf.org/html/rfc7540)
+
+[Roy Fielding's original REST chapter](https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
+
+[Microsoft API Best Practice guide](https://docs.microsoft.com/en-us/azure/best-practices-api-design)
+
 [Microsoft's API guidelines on GitHub](https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md)
 
 [API design guide Gitbook](https://geemus.gitbooks.io/http-api-design/content/en/)
