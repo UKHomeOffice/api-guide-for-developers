@@ -6,16 +6,28 @@ This document captures The Home Office's view of API best practices and standard
 
 ### Core principles
 
-* **[REST](https://en.wikipedia.org/wiki/Representational_state_transfer)** is the default choice for webservice APIs. However, don't use REST at the expense of usability eg for mobile clients. You could consider using REST [expansion](http://venkat.io/posts/expanding-your-rest-api) or even [GraphQL](https://developer.github.com/early-access/graphql/) for clients with poor latency or network reliability.
-* **Follow standards** 
-* **Understand the user need**
-* **Don't surprise your users**. 
-* **KISS**
+1. **Understand the user needs**, don't surpise your users and adopt a consumer-first approach. Ensure you know who your consumers are and talk to them. Have a mailing list for them and create a forum where the services can be discussed. Contracts can help but don't replace the human conversations.
+1. **Hide implementation details and understand your [bounded context](https://martinfowler.com/bliki/BoundedContext.html)**. Hide your database. Do not have multiple services reading or (worse) writing to the same database. This breaks encapsulation and cohesion, increases coupling and makes it difficult to change the database structure
+1. **Decentralise** services so that a team owns and operates it (they build, own and support it). Be wary of [ESB](https://en.wikipedia.org/wiki/Enterprise_service_bus)s which can force you to use a particular, centralised architectural style . Keep messaging middleware dumb and ignorant of the domain. Be wary of using [API Gateways](http://microservices.io/patterns/apigateway.html) for much more than [API key](http://stackoverflow.com/questions/1453073/what-is-an-api-key) management. Be aware of the drawbacks of orchestration / "God services" / [BPM](https://en.wikipedia..org/wiki/Business_process_management) systems which tell other services what to do. Choreography via [event driven](https://en.wikipedia.org/wiki/Event-driven_programming) and [pub/sub](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) patterns can help facilitate looser coupling.
+1. **Deploy independently** so that small changes can be released separately to other applications. This requires services to be loosely coupled, and a high degree of automated provisioning and testing (so that it's easy to create new, small services and release frequently). Minimise end-to-end tests, which can become test cycle bottlenecks, and instead focus on whether you break any of your consumers by using [consumer-driven contracts](http://techblog.newsweaver.com/why-should-you-use-consumer-driven-contracts-for-microservices-integration-tests/): API consumers write explicit expectations as tests which are made available to and tested by the service itself.  
+1. **Follow standards** and be consistent with versioning, pagination etc. The [PayPal API Style Guide](https://github.com/paypal/api-standards/blob/master/api-style-guide.md) on GitHub is a good starting point.
+1. **Document your service**
+1. **Service discovery**
+1. **KISS**. Textual payloads are easier to read even if they are less efficient. Return the minimum number of fields required. It's easier to add more fields later than to remove them. Avoid versioning unless it's really needed (and then, use URL-based versioning e.g. v2/ then v3/ to version if you have control over your consumers). Avoid client libraries (the idea is that they're DRY but logic can leak into these, and new versions require new client libraries, so make it just about the connection if you do use these)
+1. **Use tech agnostic interfaces**. Avoid Java RMI. 
+1. **[REST](https://en.wikipedia.org/wiki/Representational_state_transfer)** is the default choice for webservice APIs. However, don't use REST at the expense of usability eg for mobile clients. You could consider using REST [expansion](http://venkat.io/posts/expanding-your-rest-api) or even [GraphQL](http://graphql.org/) (see [GitHub's implementation](https://developer.github.com/early-access/graphql/)) for clients with poor latency or network reliability.
 
 
 ## REST
 
-HTTP requests are stateless; only store information in the resources themselves. Requests should be independent; they may occur in any order, so do not attempt to retain transient state information between requests. Each request should be an atomic operation: a finite state machine where a request transitions a resource from one well-defined, non-transient state to another.
+HTTP requests are stateless; only store information in the resources themselves. Requests should be independent; they may occur in any order, so do not attempt to retain transient state information between requests. Each request should be an atomic operation: a finite state machine where a request transitions a resource from one non-transient state to another.
+
+Avoid designing a REST interface that mirrors the internal structure of the data that it exposes. Instead expose business entities and the operations that an application can perform on these entities.
+
+Avoid requiring resource URIs more complex than collection/item/collection
+define your resources to avoid “chatty” web APIs that expose a large number of small resources (balance this approach against the overhead of fetching data that might not be frequently required by the client)
+
+ You can handle such non-resource scenarios through HTTP GET requests e.g. /add?operand1=99&operand2=1 could return a response message with the body containing the value 100
 
 
 ### API Endpoints
@@ -27,14 +39,14 @@ Operations must use the proper [HTTP methods](https://www.w3.org/Protocols/rfc26
 Method  | Description                                                                                                                |Idempotent?
 ------- | -------------------------------------------------------------------------------------------------------------------------- | -------------
 GET     | Return the resource | Yes
-POST    | Create a new resource based on the data provided, or submit a command                                                        | No
-PUT     | Update / replace a resource or create a named resource, based on the data provided                                                               | Yes
+POST    | Create a new resource based on the data provided in the body, or submit a command                                                        | No
+PUT     | Replace a resource (i.e. updates it) or create a named resource, based on the data provided in the body                                                               | Yes
 DELETE  | Delete a resource                                                                                                           | Yes
 HEAD    | Return metadata of a resource for a GET response                                                                            | Yes
 PATCH   | Apply a partial update to a resource                                                                                        | No
 
 
-#### POST
+### POST
 POST operations must support the Location response header to specify the location of any created resource that was not explicitly named, via the Location header.
 
 Example: the service below allows creation of hosted servers, which will be named by the service:
@@ -51,6 +63,20 @@ Location: http://api.contoso.com/account1/servers/server321
 ```
 
 Extra information can be passed to an endpoint either via a query string (e.g. `?year#2014`) or in an HTTP header (e.g. `X-Api-Key: my-key`)
+
+
+### PUT
+When an application sends an HTTP PUT request to update a resource, it specifies the URI of the resource and provides the data to be modified in the body of the request message. It specficies the Content-Type in the header.
+
+If the modification is successful, it should ideally respond with an HTTP 204 status code, indicating that the process has been successfully handled, but that the response body contains no further information. The Location header in the response contains the URI of the newly updated resource:
+
+```HTTP/1.1 204 No Content
+...
+Location: http://adventure-works.com/orders/1
+...
+Date: Fri, 22 Aug 2014 09:18:37 GMT
+```
+   
 
 
 ### Other best practice
@@ -165,15 +191,15 @@ HTTPS should be configured using modern best practices, including ciphers that s
 
 
 
-### Just use JSON
+### Prefer JSON
 
-[JSON](https://en.wikipedia.org/wiki/JSON) is the default for web APIs; it reduces complexity for both the API provider and consumer.
+Prefer [JSON](https://en.wikipedia.org/wiki/JSON) as the default for your APIs. It reduces complexity for both the API provider and consumer.
 
 General JSON guidelines:
 
-* Responses should be **a JSON object** (not an array). Using an array to return results limits the ability to include metadata about results, and limits the API's ability to add additional top-level keys in the future.
-* **Don't use unpredictable keys**. Parsing a JSON response where keys are unpredictable (e.g. derived from data) is difficult, and adds friction for clients.
-* **Use consistent case for keys**. Whether you use `under_score` or `CamelCase` for your API keys, make sure you are consistent.
+* **Use a schema**, preferably [JSON Schema](http://json-schema.org/). This will also mean you know they keys in advance (i.e. they are not dynamic, derviced from data) and that you're consistent in your case
+* Responses should be **a JSON object**, not an array. Using an array to return results limits the ability to include metadata about results.
+* **Keep JSON minified in all responses**. Extra whitespace adds needless response size to requests, and many clients for human consumption will automatically "prettify" JSON output.
 
 ### use ISO 8601 for dates
 
@@ -207,7 +233,11 @@ For more advanced configuration, see the [W3C spec](http://www.w3.org/TR/cors/) 
 
 **Avoid JSONP**
 
-JSONP is [not secure or performant](https://gist.github.com/tmcw/6244497). If IE8 or IE9 must be supported, use Microsoft's [XDomainRequest](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx?Redirected#true) object instead of JSONP. There are [libraries](https://github.com/mapbox/corslite) to help with this.
+JSONP is [not secure or performant](https://gist.github.com/tmcw/6244497).
+
+## Versioning
+
+It is usually best to avoid versioning by enabling the continuous evolution of a schema. If adding new features to an API requires a new version, this makes using the API more difficult and fragile. Prefer to add capabilities via new types and new fields on those types; avoid breaking changes and serve a versionless API
 
 ## Authentication
 How consumers authenticate with an API is important for many APIs. Whilst we've not settled on a standard the following approaches have been tried.
